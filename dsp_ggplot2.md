@@ -1,7 +1,7 @@
 ---
 title       : EDA with R
-subtitle    : 智庫驅動
-author      : Ben Chen
+subtitle    : Data Visualization with ggplot
+author      : Ben Chen, Johnson Hsieh
 job         : 
 framework   : io2012-dsp
 highlighter : highlight.js
@@ -9,28 +9,24 @@ hitheme     : zenburn
 widgets     : [mathjax]            # {mathjax, quiz, bootstrap}
 mode        : selfcontained # {standalone, draft}
 knit        : slidify::knit2slides
---- 
-## 今日重點!!!
+---
+## The Anatomy of a Plot 
+<center>
+<img src='./img/anatomy.png' width=900 align='center'></img>
+</center>
 
-### 畫圖～
+--- .largecontent
+## Data Visualization 
 
-### ggplot2
-
-### 需要的套件
-    library(ggplot2)
-    library(data.table)
-    library(dplyr)
-    library(reshape2)
-
+- 清晰有效地傳達與溝通訊息
+- 教學、研究、宣傳
+- 美學、功能兼顧
+- 統計圖形、訊息可視化
+- 參考Johnson於DSHC meetp的[DataViz 介紹](http://goo.gl/xYorRm)
 
 
 
---- .dark .segue
-
-## ggplot2 簡介
-
---- &vcenter .largecontent
-
+--- .largecontent
 ## ggplot2簡介
 
 - 2015年，最受歡迎的R套件之一
@@ -41,45 +37,70 @@ knit        : slidify::knit2slides
   - 用抽象的概念來控制圖形，避免細節繁瑣
   - 圖形美觀
 
---- &vcenter .largecontent
 
-## The Anatomy of a Plot 
+--- .largecontent
+## ggplot2基本架構
 
-<img src='./img/anatomy.png' width=900 align='center'></img>
+- 資料 (data) 和映射 (mapping)
+- 幾何對象 (`geom`etric)
+- 座標尺度 (`scale`)
+- 統計轉換 (`stat`istics)
+- 座標系統 (`coord`inante)
+- 圖層 (layer)
+- 刻面 (`facet`)
+- 主題 (`theme`)
+
+--- .largecontent
+## ggplot2 基本語法
+
+```r
+ggplot(data=..., aes(x=..., y=...)) + geom_xxx(...) +
+  stat_xxx(...) + facet_xxx(...) + ...
+```
+
+- `ggplot` 描述 data 從哪來
+- `aes` 描述圖上的元素跟 data 之類的對應關係
+- `geom_xxx` 描述要畫圖的類型及相關調整的參數
+- 常用的類型諸如：`geom_bar`, `geom_points`, `geom_line`, `geom_polygon`
+
+--- .largecontent
+## 注意事項
+- 使用 `data.frame` 儲存資料 (不可以丟 `matrix` 物件)
+- 使用 long format (利用`reshape2`將資料轉換成 1 row = 1 observation)
+- 文字型態的資料預設依 ascii 編碼順序做排序
 
 
+---
+## 需要的套件
 
---- &vcenter .largecontent
+```r
+# install.packages(c("ggplot2", "data.table", "dplyr", "reshape2"), repos = "http://cran.csie.ntu.edu.tw/")
 
-## ggplot2核心
-
-- 注意事項
-  - 使用 data.frame 儲存資料 (不可以丟 matrix 物件)
-  - 使用 long format (利用reshape2將資料轉換成 1 row = 1 observation)
-- 基本語法
-  - ggplot 描述 data 從哪來
-  - aes 描述圖上的元素跟 data 之類的對應關係
-  - geom_xxx 描述要畫圖的類型及相關調整的參數
-  - 常用的類型諸如：geom_bar, geom_points, geom_line, geom_polygon
+library(ggplot2)
+library(data.table)
+library(dplyr)
+library(reshape2)
+```
 
 
---- &vcenter .largecontent
-
-
+---
 ## 一切從讀檔開始 (CSV)
+[YouBike-Weather Data](http://goo.gl/8itFhs)
+
+
 
 ```r
 # 讀檔起手式
-ubike = read.csv('ubikeweatherutf8.csv') #請輸入正確的檔案路徑
+ubike <- read.csv('ubikebyhourutf8/ubike-hour-201502-utf8.csv') #請輸入正確的檔案路徑
 # 讀檔進階招式
-ubike = read.csv('檔案路徑', 
+ubike <- read.csv('檔案路徑', 
           colClasses = c("factor","integer","integer","factor","factor",
                          "numeric","numeric","integer","numeric","integer",
                          "integer","numeric","numeric", "integer","integer",
                          "numeric","numeric","numeric", "numeric","numeric",
                          "numeric"))
 # 讀檔大絕招
-ubike = fread('檔案路徑',
+ubike <- fread('檔案路徑',
           data.table = FALSE,
           colClasses = c("factor","integer","integer","factor",
                         "factor","numeric", "numeric", "integer",
@@ -89,69 +110,101 @@ ubike = fread('檔案路徑',
                         "numeric"))
 ```
 
---- .dark .segue
+---
+## 展示資料
 
-## 請輸入正確的檔案路徑
-
---- &vcenter .largecontent
-## 將欄位名稱換成中文 
-
-```r
-colnames(ubike) <- 
-  c("日期", "時間", "場站代號", "場站區域", "場站名稱", 
-  "緯度", "經度", "總停車格", "平均車輛數", "最大車輛數", 
-  "最小車輛數", "車輛數標準差", "平均空位數", "最大空位數", 
-  "最小空位數", "空位數標準差", "平均氣溫", "溼度", 
-  "氣壓", "最大風速", "降雨量")
 ```
+        date hour sno  sarea                       sna      lat      lng
+1 2015-02-01    0   1 信義區     捷運市政府站(3號出口) 25.04086 121.5679
+2 2015-02-01    0   2 大安區 捷運國父紀念館站(2號出口) 25.04100 121.5569
+3 2015-02-01    0   3 信義區                台北市政府 25.03780 121.5652
+4 2015-02-01    0   5 信義區                  興雅國中 25.03656 121.5687
+5 2015-02-01    0   7 信義區         信義廣場(台北101) 25.03304 121.5656
+6 2015-02-01    0   8 信義區                  世貿三館 25.03521 121.5637
+  tot avg.sbi max.sbi min.sbi std.sbi avg.bemp max.bemp min.bemp std.bemp
+1 180   4.153      11       0   3.643  175.847      180      169    3.643
+2  48   1.322       5       0   1.383   46.678       48       43    1.383
+3  40   0.407       1       0   0.495   39.593       40       39    0.495
+4  60   1.220       3       0   0.966   57.780       59       56    0.966
+5  80   2.949       9       0   3.345   75.983       79       69    3.476
+6  60   1.983       7       0   2.543   57.017       59       52    2.543
+      temp humidity pressure max.anemo rainfall
+1 13.73755 87.49700 1025.791 1.7773507        0
+2 13.80401 86.81732 1025.411 0.8515215        0
+3 13.82918 87.25139 1025.754 1.6134319        0
+4 13.83382 87.56932 1025.875 1.9129308        0
+5 13.92348 87.48805 1025.863 1.9093223        0
+6 13.88992 87.21782 1025.738 1.6235643        0
+```
+
+--- .largecontent
+## 欄位說明
+<pre>
+   name.eng   name.cht        name.eng     name.cht
+1      date       日期   12    std.sbi 車輛數標準差
+2      hour       時間   13   avg.bemp   平均空位數
+3       sno   場站代號   14   max.bemp   最大空位數
+4     sarea   場站區域   15   min.bemp   最小空位數
+5       sna   場站名稱   16   std.bemp 空位數標準差
+6       lat       緯度   17       temp     平均氣溫
+7       lng       經度   18   humidity         溼度
+8       tot   總停車格   19   pressure         氣壓
+9   avg.sbi 平均車輛數   20  max.anemo     最大風速
+10  max.sbi 最大車輛數   21   rainfall       降雨量
+11  min.sbi 最小車輛數               
+</pre>
+
 
 --- .dark .segue
 
 ## 單一數值：Histogram
 
---- &vcenter .largecontent
-
+---
 ## Histogram
+- `geom_histogram`
 
 ```r
-thm <- theme(text=element_text(size=20,family="STHeiti")) # 控制字體與大小
-# STHeiti是只有Mac才有的字體
+thm <- function() theme(text=element_text(size=20, family="STHeiti")) # 控制字體與大小
+# STHeiti是只有Mac才有的字體, 用來解決Mac系統中文顯示錯誤的問題
+# Windows系統的使用者請忽略 `+ thm()` 指令
 ggplot(ubike) +
-  geom_histogram(aes(x = 最大風速, y=..count..))+thm
+  geom_histogram(aes(x=max.anemo, y=..count..)) + thm()
 ```
 
 <img src="assets/fig/wind1-1.png" title="plot of chunk wind1" alt="plot of chunk wind1" style="display: block; margin: auto;" />
 
---- &vcenter .largecontent
-
+--- 
 ## Histogram
+- `aes(y=..count..)` vs. `aes(y=..density..)`
 
 ```r
 ggplot(ubike) +
-  geom_histogram(aes(x = 最大風速, y=..density..))+thm
+  geom_histogram(aes(x=max.anemo, y=..density..)) + thm()
 ```
 
 <img src="assets/fig/wind2-1.png" title="plot of chunk wind2" alt="plot of chunk wind2" style="display: block; margin: auto;" />
 
---- &vcenter .largecontent
+--- 
 
 ## Histogram
+- `aes(x=..., y=..., fill=...)`
 
 ```r
 ggplot(ubike) +
-  geom_histogram(aes(x = 最大風速, y=..density..,fill=..count..))+thm
+  geom_histogram(aes(x=max.anemo, y=..density.., fill=..count..)) + thm()
 ```
 
 <img src="assets/fig/wind3-1.png" title="plot of chunk wind3" alt="plot of chunk wind3" style="display: block; margin: auto;" />
 
---- &vcenter .largecontent
+---
 
 ## Histogram + Density
+- `geom_histogram() + geom_density()`
 
 ```r
-ggplot(ubike,aes(x = 最大風速)) +
-  geom_histogram(aes(y=..density..,fill=..count..))+
-  geom_density()+thm
+ggplot(ubike, aes(x=max.anemo)) +
+  geom_histogram(aes(y=..density.., fill=..count..)) +
+  geom_density() + thm()
 ```
 
 <img src="assets/fig/wind4-1.png" title="plot of chunk wind4" alt="plot of chunk wind4" style="display: block; margin: auto;" />
@@ -160,179 +213,200 @@ ggplot(ubike,aes(x = 最大風速)) +
 
 ## 量化 v.s. 量化：Scatter Plot
 
---- &vcenter .largecontent
+---
 
 ## 繪圖之前的整理資料
-
-### 文山區各站點在"2015-02"的平均溼度 vs. 平均雨量
+文山區各站點在"2015-02"的平均溼度 vs. 平均雨量
 
 
 ```r
-x3 <- filter(ubike, grepl("2015-02", 日期, fixed = TRUE), 場站區域 == "文山區") %>%
-  group_by(場站名稱) %>% 
-  summarise(平均降雨量 = mean(降雨量), 平均溼度 = mean(溼度))
+x3 <- filter(ubike, grepl("2015-02", date, fixed = TRUE), sarea == "文山區") %>%
+  group_by(sna) %>% 
+  summarise(rain.avg = mean(rainfall), hum.avg = mean(humidity))
+x3 # print(x3)
 ```
 
---- .largecontent
+```
+Source: local data frame [12 x 3]
 
-## Scatter Plot
+                     sna  rain.avg  hum.avg
+                  (fctr)     (dbl)    (dbl)
+1           國立政治大學 0.9138340 86.78447
+2  捷運動物園站(2號出口) 0.6944844 86.28648
+3             捷運景美站 0.6752715 79.55976
+4             捷運木柵站 0.6601309 85.49780
+5                 考試院 0.9153789 80.25694
+6         羅斯福景隆街口 0.6036172 80.38156
+7       師範大學公館校區 0.7153086 80.71318
+8       台北花木批發市場 0.6517227 80.96029
+9       臺北市立景美女中 1.0727852 81.86252
+10          文山行政中心 0.8457266 85.15373
+11          文山運動中心 0.6683047 82.91816
+12              興豐公園 0.6461699 81.34372
+```
 
+--- 
+
+## Scatter plot
+- `geom_point()`
+- 參數`size`放在`aes()`函數外面，表示所有的資料固定用相同的size
 
 ```r
 ggplot(x3) +
-  geom_point(aes(x = 平均溼度, y = 平均降雨量),size=5) + #size控制點的大小
-  thm
+  geom_point(aes(x = rain.avg, y = hum.avg), size=5) + #size控制點的大小
+  thm()
 ```
 
 <img src="assets/fig/ubike.site.wet.rainfall2-1.png" title="plot of chunk ubike.site.wet.rainfall2" alt="plot of chunk ubike.site.wet.rainfall2" style="display: block; margin: auto;" />
 
 --- .largecontent
-
-## Grouped Scatter Plot
+## Grouped scatter plot
 
 
 ```r
 ggplot(x3) +
-  # 放在aes裡的colour和size可依資料調整顏色和大小
-  geom_point(aes(x = 平均溼度, y = 平均降雨量, colour = 場站名稱,size=平均降雨量))+
+  # 放在aes裡的 colour 和 size 可依資料調整顏色和大小
+  geom_point(aes(x = rain.avg, y = hum.avg, colour=sna, size=rain.avg)) +
   # 限制大小
   scale_size(range=c(5,10)) +  
-  thm
+  thm()
 ```
 
 --- .largecontent
-
-## Grouped Scatter Plot
+## Grouped scatter plot
 
 <img src="assets/fig/ubike.site.wet.rainfall3-1.png" title="plot of chunk ubike.site.wet.rainfall3" alt="plot of chunk ubike.site.wet.rainfall3" style="display: block; margin: auto;" />
 
 --- .dark .segue
-
 ## 量化 v.s. 量化：Line Chart
 
 --- 
-
 ## WorldPhones
 
-```
-##      N.Amer Europe Asia S.Amer Oceania
-## 1951  45939  21574 2876   1815    1646
-## 1956  60423  29990 4708   2568    2366
-## 1957  64721  32510 5230   2695    2526
-## 1958  68484  35218 6662   2845    2691
-## 1959  71799  37598 6856   3000    2868
-## 1960  76036  40341 8220   3145    3054
-## 1961  79831  43173 9053   3338    3224
-##      Africa Mid.Amer
-## 1951     89      555
-## 1956   1411      733
-## 1957   1546      773
-## 1958   1663      836
-## 1959   1769      911
-## 1960   1905     1008
-## 1961   2005     1076
+```r
+data(WorldPhones)
+WorldPhones
 ```
 
---- &vcenter .largecontent
+```
+     N.Amer Europe Asia S.Amer Oceania Africa Mid.Amer
+1951  45939  21574 2876   1815    1646     89      555
+1956  60423  29990 4708   2568    2366   1411      733
+1957  64721  32510 5230   2695    2526   1546      773
+1958  68484  35218 6662   2845    2691   1663      836
+1959  71799  37598 6856   3000    2868   1769      911
+1960  76036  40341 8220   3145    3054   1905     1008
+1961  79831  43173 9053   3338    3224   2005     1076
+```
 
-## 每年亞洲的電話數量
+---
+## 小挑戰
+如何畫出每年亞洲電話數量的Line chart?
 
-    ggplot(WorldPhones,aes(x=?????,y=Asia))......
+    ggplot(WorldPhones, aes(x=?????, y=Asia)) + ......
 
---- &vcenter .largecontent
+---
 
 ## 哪裏不對？
+
+```r
+ggplot(WorldPhones)
+```
+
+```
+Error: ggplot2 doesn't know how to deal with data of class matrix
+```
 
 ```r
 class(WorldPhones)
 ```
 
 ```
-## [1] "matrix"
+[1] "matrix"
 ```
 
---- &vcenter .largecontent
-
-## data.frame
+---
+## `matrix` 轉換 `data.frame`
 
 ```r
-WP.df=as.data.frame(WorldPhones)
+WP.df <- as.data.frame(WorldPhones)
 WP.df$year <- rownames(WP.df)
 class(WP.df)
 ```
 
 ```
-## [1] "data.frame"
+[1] "data.frame"
 ```
 
---- &vcenter .largecontent
-
-## Line Chart???
+---
+## Line chart
+- `geom_line()`
 
 ```r
-ggplot(WP.df,aes(x=year,y=Asia))+geom_line()
+ggplot(WP.df, aes(x=year, y=Asia)) + geom_line()
 ```
 
 ```
-## geom_path: Each group consist of only one observation. Do you need to adjust the group aesthetic?
+geom_path: Each group consists of only one observation. Do you need to
+adjust the group aesthetic?
 ```
 
-![plot of chunk wp4 ](assets/fig/wp4 -1.png) 
+<img src="assets/fig/wp4 -1.png" title="plot of chunk wp4 " alt="plot of chunk wp4 " style="display: block; margin: auto;" />
 
---- &vcenter .largecontent
 
+---
 ## Should be Number
+- `as.numeric()`
 
 ```r
 str(WP.df)
 ```
 
 ```
-## 'data.frame':	7 obs. of  8 variables:
-##  $ N.Amer  : num  45939 60423 64721 68484 71799 ...
-##  $ Europe  : num  21574 29990 32510 35218 37598 ...
-##  $ Asia    : num  2876 4708 5230 6662 6856 ...
-##  $ S.Amer  : num  1815 2568 2695 2845 3000 ...
-##  $ Oceania : num  1646 2366 2526 2691 2868 ...
-##  $ Africa  : num  89 1411 1546 1663 1769 ...
-##  $ Mid.Amer: num  555 733 773 836 911 ...
-##  $ year    : chr  "1951" "1956" "1957" "1958" ...
+'data.frame':	7 obs. of  8 variables:
+ $ N.Amer  : num  45939 60423 64721 68484 71799 ...
+ $ Europe  : num  21574 29990 32510 35218 37598 ...
+ $ Asia    : num  2876 4708 5230 6662 6856 ...
+ $ S.Amer  : num  1815 2568 2695 2845 3000 ...
+ $ Oceania : num  1646 2366 2526 2691 2868 ...
+ $ Africa  : num  89 1411 1546 1663 1769 ...
+ $ Mid.Amer: num  555 733 773 836 911 ...
+ $ year    : chr  "1951" "1956" "1957" "1958" ...
 ```
 
 ```r
-WP.df$year=as.numeric(WP.df$year)
+WP.df$year <- as.numeric(WP.df$year)
 ```
 
---- &vcenter .largecontent
+---
 
-## Line Chart!!!
+## Line chart
 
 ```r
-ggplot(WP.df,aes(x=year,y=Asia))+
-  geom_line()+thm
+ggplot(WP.df, aes(x=year, y=Asia)) +
+  geom_line() + thm()
 ```
 
 <img src="assets/fig/wp6-1.png" title="plot of chunk wp6" alt="plot of chunk wp6" style="display: block; margin: auto;" />
 
---- &vcenter .largecontent
-
-## Line Chart and Scatter Ploet
+---
+## Line chart and scatter plot
 
 ```r
-ggplot(WP.df,aes(x=year,y=Asia))+
-  geom_line(size=2)+ #size控制線的寬度或點的大小
-  geom_point(size=5)+thm
+ggplot(WP.df, aes(x=year, y=Asia)) +
+  geom_line(size=2) + #size控制線的寬度或點的大小
+  geom_point(size=5) + thm()
 ```
 
 <img src="assets/fig/wp7-1.png" title="plot of chunk wp7" alt="plot of chunk wp7" style="display: block; margin: auto;" />
 
---- &vcenter .largecontent
+---
 
-## How to plot multiple line?
+## How to plot multiple lines?
 
 ### Wide format
 <!-- html table generated in R 3.2.2 by xtable 1.8-0 package -->
-<!-- Mon Nov 30 08:10:28 2015 -->
+<!-- Thu Jan 14 02:29:25 2016 -->
 <table border=1>
 <tr> <th>  </th> <th> N.Amer </th> <th> Europe </th> <th> Asia </th> <th> S.Amer </th> <th> Oceania </th> <th> Africa </th> <th> Mid.Amer </th> <th> year </th>  </tr>
   <tr> <td align="right"> 1951 </td> <td align="right"> 45939.00 </td> <td align="right"> 21574.00 </td> <td align="right"> 2876.00 </td> <td align="right"> 1815.00 </td> <td align="right"> 1646.00 </td> <td align="right"> 89.00 </td> <td align="right"> 555.00 </td> <td align="right"> 1951.00 </td> </tr>
@@ -346,17 +420,16 @@ ggplot(WP.df,aes(x=year,y=Asia))+
 
 $$\Downarrow$$
 
---- &vcenter .largecontent
-
+---
 ### Long format
 
 ```r
 library(reshape2)
-WP.long=melt(WP.df,id='year') #id是將保留的欄位名稱
-colnames(WP.long)=c('year','area','number')
+WP.long <- melt(WP.df, id='year') #id是將保留的欄位名稱
+colnames(WP.long) <- c('year','area','number')
 ```
 <!-- html table generated in R 3.2.2 by xtable 1.8-0 package -->
-<!-- Mon Nov 30 08:10:28 2015 -->
+<!-- Thu Jan 14 02:29:25 2016 -->
 <table border=1>
 <tr> <th>  </th> <th> year </th> <th> area </th> <th> number </th>  </tr>
   <tr> <td align="right"> 1 </td> <td align="right"> 1951.00 </td> <td> N.Amer </td> <td align="right"> 45939.00 </td> </tr>
@@ -410,13 +483,12 @@ colnames(WP.long)=c('year','area','number')
   <tr> <td align="right"> 49 </td> <td align="right"> 1961.00 </td> <td> Mid.Amer </td> <td align="right"> 1076.00 </td> </tr>
    </table>
 
---- .largecontent
+---
 ## Multiple Line
 
 ```r
-ggplot(WP.long,aes(x=year,y=number,group=area,color=area))+ # gruop按照不同區域劃線
-  geom_line(size=1.5)+
-  geom_point(size=5)+thm
+ggplot(WP.long,aes(x=year, y=number, group=area, color=area)) + # gruop按照不同區域劃線
+  geom_line(size=1.5) + geom_point(size=5) + thm()
 ```
 
 <img src="assets/fig/wp11-1.png" title="plot of chunk wp11" alt="plot of chunk wp11" style="display: block; margin: auto;" />
@@ -424,21 +496,21 @@ ggplot(WP.long,aes(x=year,y=number,group=area,color=area))+ # gruop按照不同�
 
 
 --- .dark .segue
-
 ## 質化 v.s. 量化：Bar Chart
 
---- &vcenter .largecontent
+---
 ## 讀取檔案
+[痞客邦 Visitor Log 訓練資料集 (train.csv)](http://goo.gl/mwtvMj)
 
 
 
 ```r
-pixnet=read.csv('train.csv',stringsAsFactors = FALSE)
+pixnet <- read.csv('train.csv', stringsAsFactors = FALSE)
 ```
 
 - 2014-11-01 至 2014-11-30 期間，10000 筆隨機取樣的台灣地區網站訪客的瀏覽紀錄
 
---- &vcenter 
+--- 
 ## 欄位說明
 - url_hash - 去識別後的部落格文章 url
 - resolution - 瀏覽裝置的螢幕解析度
@@ -453,179 +525,237 @@ pixnet=read.csv('train.csv',stringsAsFactors = FALSE)
 - referrer_venue - 訪客來源（網域）
 
 --- 
-## Bar Chart
-
+## Bar chart - `geom_bar()`
 
 ```r
-ggplot(pixnet,aes(x=referrer_venue))+
-  geom_bar(stat='bin')+thm # stat='bin'算個數
+ggplot(pixnet, aes(x=referrer_venue)) + geom_bar() + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  thm()
 ```
 
 <img src="assets/fig/pix1-1.png" title="plot of chunk pix1" alt="plot of chunk pix1" style="display: block; margin: auto;" />
 
+--- 
+## Bar chart
+- 長條圖排序
+
+```r
+library(dplyr)
+level <- table(pixnet$referrer_venue) %>% names
+rank <- table(pixnet$referrer_venue) %>% order(decreasing = TRUE)
+level
+```
+
+```
+[1] "7headlines"  "direct/none" "facebook"    "google"      "other"      
+[6] "pixnet"      "yahoo"      
+```
+
+```r
+level[rank]
+```
+
+```
+[1] "pixnet"      "google"      "direct/none" "yahoo"       "facebook"   
+[6] "other"       "7headlines" 
+```
+
+```r
+pixnet$referrer_venue <- factor(pixnet$referrer_venue, levels = level[rank])
+```
+
+---
+## Bar chart
+- 長條圖排序
+
+```r
+ggplot(pixnet, aes(x=referrer_venue)) + geom_bar() + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  thm()
+```
+
+<img src="assets/fig/unnamed-chunk-7-1.png" title="plot of chunk unnamed-chunk-7" alt="plot of chunk unnamed-chunk-7" style="display: block; margin: auto;" />
+
+
 ---
 ## 兩種類別
 
 
 ```r
-ub2=filter(ubike, 場站區域=='中和區',時間==8) %>% 
-  mutate(is.rain=降雨量>1) %>%
+ub2 <- filter(ubike, sarea=='中和區',hour==8) %>% 
+  mutate(is.rain=rainfall>1) %>%
   mutate(is.rain=factor(is.rain, levels=c(FALSE, TRUE), 
                         labels = c("晴天","雨天"))) %>%
-  select(日期,  平均空位數, 場站名稱, is.rain,總停車格) %>%
-  group_by(場站名稱,  is.rain) %>%
-  summarise(use_rate=mean(平均空位數/總停車格)) 
+  select(date,avg.bemp, sna, is.rain, tot) %>%
+  group_by(sna, is.rain) %>%
+  summarise(use_rate=mean(avg.bemp/tot)) 
 head(ub2)
 ```
 
 ```
-## Source: local data frame [6 x 3]
-## Groups: 場站名稱 [3]
-## 
-##         場站名稱 is.rain  use_rate
-##           (fctr)  (fctr)     (dbl)
-## 1 捷運永安市場站    晴天 0.6671052
-## 2 捷運永安市場站    雨天 0.6483044
-## 3       秀山國小    晴天 0.4966519
-## 4       秀山國小    雨天 0.4436588
-## 5       中和公園    晴天 0.6363115
-## 6       中和公園    雨天 0.5917228
+Source: local data frame [6 x 3]
+Groups: sna [3]
+
+             sna is.rain  use_rate
+          (fctr)  (fctr)     (dbl)
+1 捷運永安市場站    晴天 0.7410044
+2 捷運永安市場站    雨天 0.7827569
+3       秀山國小    晴天 0.5095047
+4       秀山國小    雨天 0.3444234
+5       中和公園    晴天 0.6878744
+6       中和公園    雨天 0.6147391
 ```
 
---- &vcenter .largecontent
+---
 ## 兩種類別
 
 
 ```r
-las2 <- theme(axis.text.x = element_text(angle = 90, hjust = 1),
-              text=element_text(size=20,family="STHeiti")) #控制字的方向
-ggplot(ub2,aes(x=場站名稱,y=use_rate,fill=is.rain))+
-  geom_bar(stat='identity')+
-  las2 # stat='identity'以表格的值做為bar的高度
+ggplot(ub2, aes(x=sna, y=use_rate, fill=is.rain)) +
+  geom_bar(stat='identity') + # stat='identity'以表格的值做為bar的高度
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + #控制字的方向
+  thm()
 ```
 
---- &vcenter .largecontent
+---
 ## 兩種類別: stack
 
 <img src="assets/fig/ubar1-1.png" title="plot of chunk ubar1" alt="plot of chunk ubar1" style="display: block; margin: auto;" />
 
---- &vcenter .largecontent
+---
 ## 兩種類別: dodge
 
 
 ```r
-ggplot(ub2,aes(x=場站名稱,y=use_rate,fill=is.rain))+
-  geom_bar(stat='identity',position = 'dodge')+las2 #dodge類別並排
+ggplot(ub2,aes(x=sna, y=use_rate, fill=is.rain)) +
+  geom_bar(stat='identity',position = 'dodge') + #dodge類別並排
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + #控制字的方向
+  thm()
 ```
 
 <img src="assets/fig/ubar2-1.png" title="plot of chunk ubar2" alt="plot of chunk ubar2" style="display: block; margin: auto;" />
 
---- &vcenter .largecontent
+---
+## Pie Chart: Bar chart變形
+### 整理資料
+
+```r
+pix <- data.frame(table(pixnet$referrer_venue)) #table可以算個類別個數
+colnames(pix) <- c('referrer','count')
+pix[5,2] <- pix[5,2] + pix[1,2]
+pix <- pix[-1,]
+```
+
+---
+## Pie Chart: Bar Chart變形
+![plot of chunk pix3](assets/fig/pix3-1.png) 
+
+---
+## Pie Chart: Bar Chart變形
+
+```r
+ggplot(pix,aes(x="", y=count, fill=referrer))+
+  geom_bar(stat='identity', width=1)+
+  coord_polar('y')+
+  geom_text(aes(y = count*0.5+ c(0, cumsum(count)[-length(count)]), 
+                label = paste(round(count/sum(count),3)*100,'%',sep="")),
+            size=5)+
+  theme(axis.title.y=element_blank(),
+        axis.text.x=element_blank(),
+        panel.grid=element_blank()) + thm()
+```
+
+
+---
 ## Pie Chart: Bar Chart變形
 ### 整理資料
 
 ```r
-pix=data.frame(table(pixnet$referrer_venue)) #table可以算個類別個數
-colnames(pix)=c('入口網站','數量')
-pix[5,2]=pix[5,2]+pix[1,2]
-pix=pix[-1,]
-```
+pix <- arrange(pix, -count)
 
---- &vcenter .largecontent
-## Pie Chart: Bar Chart變形
-![plot of chunk pix3](assets/fig/pix3-1.png) 
-
---- &vcenter .largecontent
-## Pie Chart: Bar Chart變形
-
-```r
-ggplot(pix,aes(x="",y=數量,fill=入口網站))+
-  geom_bar(stat='identity',width=1)+
-  coord_polar('y')+
-  geom_text(aes(y = 數量*0.5+ c(0, cumsum(數量)[-length(數量)]), 
-                label = paste(round(數量/sum(數量),3)*100,'%',sep="")),
-            size=7)+
+ggplot(pix,aes(x="", y=count, fill=referrer)) +
+  geom_bar(stat='identity',width=1) +
+  coord_polar('y') +
+  geom_text(aes(y = count*0.5 + c(0, cumsum(count)[-length(count)]), 
+                label = paste(round(count/sum(count),3)*100,'%',sep="")),
+            size=5) +
   theme(axis.title.y = element_blank(),
         axis.text.x=element_blank(),
-        panel.grid=element_blank(),
-        text=element_text(size=20,family="STHeiti"))
+        panel.grid=element_blank()) + thm()
 ```
+
+---
+## Pie Chart: Bar Chart變形
+### 整理資料
 
 
 --- .dark .segue
+## 快速重播 + 進階繪圖
 
-## The Grammer of Graphics
-
---- &vcenter .largecontent
-
+--- .largecontent
 ## ggplot2基本架構
 
 - 資料 (data) 和映射 (mapping)
-- 幾何對象 (<font color='red'>geom</font>etric)
-- 座標尺度 (<font color='red'>scale</font>)
-- 統計轉換 (<font color='red'>stat</font>istics)
-- 座標系統 (<font color='red'>coord</font>inante)
+- 幾何對象 (`geom`etric)
+- 座標尺度 (`scale`)
+- 統計轉換 (`stat`istics)
+- 座標系統 (`coord`inante)
 - 圖層 (layer)
-- 刻面 (<font color='red'>facet</font>)
-- 主題 (<font color='red'>theme</font>)
-
----
-## Data and Mapping
-
-
-```r
-ggplot(data=WP.df)+geom_line(aes(x=year,y=Asia))
-```
-
-### Data is Data
-### mapping: aes(x=...,y=...)
-
----
-## <font color='red'>geom</font>etric
-
-### geom_line and geom_point
-
-```r
-ggplot(WP.df,aes(x=year,y=Asia))+
-  geom_line(size=2)+geom_point(size=5)
-```
-
-<img src="assets/fig/unnamed-chunk-5-1.png" title="plot of chunk unnamed-chunk-5" alt="plot of chunk unnamed-chunk-5" style="display: block; margin: auto;" />
+- 刻面 (`facet`)
+- 主題 (`theme`)
 
 --- 
-## <font color='red'>scale</font>
+## Data and Mapping
+- data : `ggplot(data=..)`
+- mapping : `aes(x=..., y=...)`
 
+```r
+ggplot(data=WP.df) + geom_line(aes(x=year, y=Asia))
+```
+
+---
+## `geom`etric
+- `geom_line`, `geom_point`, ...
+
+```r
+ggplot(WP.df, aes(x=year,y=Asia)) +
+  geom_line(size=2) + geom_point(size=5)
+```
+
+<img src="assets/fig/unnamed-chunk-10-1.png" title="plot of chunk unnamed-chunk-10" alt="plot of chunk unnamed-chunk-10" style="display: block; margin: auto;" />
+
+--- 
+## `scale`
+- `size`, `scale_size`, `scale_xxx_xxx`, ...
 
 ```r
 ggplot(x3) +
-  geom_point(aes(x =平均溼度, y=平均降雨量,colour=場站名稱,size=平均降雨量))+
-  scale_size(range=c(5,10)) +thm
+  geom_point(aes(x = rain.avg, y = hum.avg), size=5) + #size控制點的大小
+  thm()
 ```
 
 <img src="assets/fig/scale1-1.png" title="plot of chunk scale1" alt="plot of chunk scale1" style="display: block; margin: auto;" />
 
----
-## <font color='red'>stat</font>istics
+--- 
+## `stat`istics
 
 
 ```r
- ggplot(pressure,aes(x=temperature,y=pressure))+
-  geom_point()+
-  stat_smooth()
+ ggplot(pressure,aes(x=temperature, y=pressure)) +
+  geom_point() + stat_smooth()
 ```
 
-<img src="assets/fig/unnamed-chunk-6-1.png" title="plot of chunk unnamed-chunk-6" alt="plot of chunk unnamed-chunk-6" style="display: block; margin: auto;" />
+<img src="assets/fig/unnamed-chunk-11-1.png" title="plot of chunk unnamed-chunk-11" alt="plot of chunk unnamed-chunk-11" style="display: block; margin: auto;" />
 
---- &twocol .largecontent
-
-## <font color='red'>coord</font>inante 
+--- &twocol
+## `coord`inante 
 
 *** =left
 
 
 ```r
-ggplot(pix,aes(x="",y=數量,fill=入口網站))+
-  geom_bar(stat='identity')+thm
+ggplot(pix,aes(x="", y=count, fill=referrer)) +
+  geom_bar(stat='identity') + thm()
 ```
 
 ![plot of chunk pix5](assets/fig/pix5-1.png) 
@@ -634,91 +764,85 @@ ggplot(pix,aes(x="",y=數量,fill=入口網站))+
 
 
 ```r
-ggplot(pix,aes(x="",y=數量,fill=入口網站))+
-  geom_bar(stat='identity',width=1)+
-  coord_polar('y')+thm
+ggplot(pix,aes(x="", y=count, fill=referrer)) +
+  geom_bar(stat='identity', width=1) +
+  coord_polar('y') + thm()
 ```
 
 ![plot of chunk pix6](assets/fig/pix6-1.png) 
 
 
---- 
-## <font color='red'>facet</font>
+--- .largecontent
+## `facet`
+- 資料整理，`中和區``各場站``每日平均雨量`
 
 ```r
-rain <- filter(ubike, grepl("2015-02", 日期, fixed = TRUE), 場站區域 == "中和區") %>%
-  group_by(日期,場站名稱) %>% 
-  summarise(每日平均降雨量 = mean(降雨量))
+rain <- filter(ubike, grepl("2015-02", date, fixed = TRUE), sarea == "中和區") %>%
+  group_by(date, sna) %>% 
+  summarise(avg.rain = mean(rainfall))
 ```
 
---- .largecontent
-
-## <font color='red'>facet</font>
-### Line Chart
+---
+## `facet`
+- Line Chart
 
 ```r
-ggplot(rain) + thm+las2+
-  geom_line(aes(x = 日期, y = 每日平均降雨量,group=場站名稱,colour=場站名稱),size=2)
+ggplot(rain) + 
+  geom_line(aes(x=date, y=avg.rain, group=sna, colour=sna), size=2) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + #控制字的方向
+  thm()
 ```
 
 <img src="assets/fig/ubike.site.wet.rainfall13-1.png" title="plot of chunk ubike.site.wet.rainfall13" alt="plot of chunk ubike.site.wet.rainfall13" style="display: block; margin: auto;" />
 
 --- .largecontent
-
 ## Line Chart in Facets
 
 
 ```r
-ggplot(rain) +thm+las2+facet_wrap(~場站名稱,nrow=2)+ # facet_wrap將各站的情況分開畫
-  geom_line(aes(x = 日期, y = 每日平均降雨量,group=場站名稱,colour=場站名稱),size=2)
+ggplot(rain) + 
+  geom_line(aes(x=date, y=avg.rain, group=sna, colour=sna),size=2) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + #控制字的方向
+  thm() +
+  facet_wrap(~sna, nrow=2) # facet_wrap將各站的情況分開畫
 ```
 
 <img src="assets/fig/ubike.site.wet.rainfall14-1.png" title="plot of chunk ubike.site.wet.rainfall14" alt="plot of chunk ubike.site.wet.rainfall14" style="display: block; margin: auto;" />
 
 --- .dark .segue
-## 可以存檔嗎？
+## 圖形輸出
 
---- &vcenter .largecontent
-## 存檔
+--- .largecontent
+## 圖形輸出
+- 利用RStudio UI介面存擋
+- 命立列輸出
+
     # 畫完圖之後，再存檔~~
     ggsave('檔案名稱')
+    ggsave("mtcars.pdf", width = 4, height = 4)
+    ggsave("mtcars.png", width = 4, height = 4, dpi = 300)
+
+
 
 --- .dark .segue
 ## 學習資源
 
---- &vcenter .largecontent
-
+--- .largecontent
 - [ggplot2 cheat sheet from RStudio Inc.](http://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf)
 - [ggplot2 官方文件](http://docs.ggplot2.org/current/index.html)
 
---- &vcenter .largecontent
 
-## 本週目標
 
-### 環境設定
-
-- 建立可以使用R 的環境
-- 了解R 的使用界面
-
-### 學習R 語言
-
-- 透過實際的範例學習R 語言
-    - 讀取資料
-    - 選取資料
-    - 敘述統計量與視覺化
-
---- &vcenter .largecontent
-
+---  .largecontent
 ## 掌握心法後，如何自行利用R 解決問題
 
 - 了解自己的需求
 - 詢問關鍵字與函數
-    - 歡迎來信 <benjamin0901@gmail.com> 或其他教師
+    - 歡迎來信 <benjamin0901@gmail.com>, <johnson@dsp.im>或其他教師
     - 多多交流
         - [Taiwan R User Group](http://www.meetup.com/Taiwan-R)，mailing list: <Taiwan-useR-Group-list@meetup.com>
         - ptt R_Language版
         - [R軟體使用者論壇](https://groups.google.com/forum/#!forum/taiwanruser)
-    - `sos`套件，請見Demo
 
 
 --- .dark .segue
