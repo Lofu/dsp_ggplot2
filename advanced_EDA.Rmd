@@ -11,7 +11,7 @@ mode        : selfcontained # {standalone, draft}
 knit        : slidify::knit2slides
 --- 
 ## 先載入會用到的套件
-```{r echo=TRUE, eval=FALSE}
+```{r adv1, echo=TRUE, eval=FALSE}
 library(data.table) # data ETL
 library(dplyr)      # data ETL
 library(knitr)      # dynamic report generation, RMarkdown
@@ -43,7 +43,7 @@ library(ggdendro)
 ```
 
 
-```{r cache=TRUE, echo=TRUE, eval=FALSE}
+```{r adv3, echo=TRUE, eval=FALSE}
 ubike <- fread("data/ubikebyhourutf8/ubike-hour-201502-utf8.csv", 
                data.table = FALSE,
               colClasses=c("factor","integer","integer","factor","factor","numeric",
@@ -63,7 +63,7 @@ ubike <- fread("../../data/ubikebyhourutf8/ubike-hour-201502-utf8.csv",
 --- .dark .segue
 
 ## 訂定主題
-```{r echo=FALSE,warning=FALSE}
+```{r adv5, echo=FALSE, warning=FALSE}
 ubike1 <- filter(ubike, sno==1) %>%
   mutate(sbi.range=max.sbi-min.sbi) %>%
   mutate(is.rushhours=cut(hour, breaks=c(0, 8, 10, 17, 20, 24), 
@@ -96,7 +96,7 @@ tab1 <- filter(ubike1, is.rushhours==1, is.weekday==1) %>%
 --- 
 ## 整理一下資料
 
-```{r basic-summary}
+```{r adv6, basic-summary}
 ubike1 <- filter(ubike, sno==1) %>%
   mutate(sbi.range=max.sbi-min.sbi) %>%
   mutate(is.rushhours=cut(hour, breaks=c(0, 8, 10, 17, 20, 24), 
@@ -137,7 +137,7 @@ ggplot(df1, aes(x=hour, y=rate.sbi)) +
 
 *** =left
 
-```{r,echo=FALSE}
+```{r adv8, echo=FALSE}
 # 有車率
 df1 <- group_by(ubike1, date, hour) %>%
   summarise(rate.sbi=mean(avg.sbi)/tot) %>%
@@ -182,7 +182,7 @@ kable(df2[17:22,], format="html", digits=3, align="c")
 
 ---  .largecontent
 
-```{r results='asis',echo=TRUE,eval=FALSE}
+```{r adv10, results='asis',echo=TRUE,eval=FALSE}
 df2 <- filter(ubike, sno==1) %>% 
   mutate(is.rain=rainfall>1) %>%
   mutate(is.rain=factor(is.rain, levels=c(FALSE, TRUE), 
@@ -215,7 +215,7 @@ ggplot(df2, aes(x=hour, y=rate.sbi, fill=is.rain)) +
 
 ---  .largecontent
 ## Dodge Plot
-```{r echo=FALSE,fig.width=12,fig.height=7}
+```{r weather-barchar-3, echo=FALSE,fig.width=12,fig.height=7}
 ggplot(df2, aes(x=hour, y=rate.sbi, fill=is.rain)) +
   geom_bar(stat="identity", position="dodge") + 
   labs(x="時間", y="有車率") +
@@ -237,7 +237,7 @@ ggplot(df2, aes(x=hour, y=rate.sbi, fill=is.rain)) +
 
 ---  .largecontent
 ## Facet panels
-```{r echo=FALSE,fig.width=12, fig.height=6}
+```{r weather-barchar-5, echo=FALSE,fig.width=12, fig.height=6}
 ggplot(df2, aes(x=hour, y=rate.sbi, fill=is.rain)) +
   geom_bar(stat="identity", position="dodge") + 
   labs(x="時間", y="有車率") +
@@ -249,7 +249,7 @@ ggplot(df2, aes(x=hour, y=rate.sbi, fill=is.rain)) +
 ---  .largecontent
 ## Facet panels
   Hint: `facet_grid(y~.)` or `facet_grid(.~x)`
-```{r eval=FALSE}
+```{r weather-barchar-6, eval=FALSE}
 ggplot(df2, aes(x=hour, y=rate.sbi, fill=is.rain)) +
   geom_bar(stat="identity", position="dodge") + 
   labs(x="時間", y="有車率") +
@@ -261,7 +261,7 @@ ggplot(df2, aes(x=hour, y=rate.sbi, fill=is.rain)) +
 
 ---  .largecontent
 ## Facet panels
-```{r fig.width=12,fig.height=6,echo=FALSE}
+```{r weather-barchar-7, fig.width=12,fig.height=6,echo=FALSE}
 ggplot(df2, aes(x=hour, y=rate.sbi, fill=is.rain)) +
   geom_bar(stat="identity", position="dodge") + 
   labs(x="時間", y="有車率") +
@@ -273,7 +273,7 @@ ggplot(df2, aes(x=hour, y=rate.sbi, fill=is.rain)) +
 ---  .largecontent
 ## Pyramid
 Hint: `filter(df2, is.rain=="晴天")`, and `coord_flip()`
-```{r eval=FALSE}
+```{r weather-barchar-8, eval=FALSE}
 ggplot(df2, aes(x=hour,y=rate.sbi, fill=is.rain)) + 
   geom_bar(data=filter(df2, is.rain=="晴天"), stat="identity") + 
   geom_bar(aes(y=rate.sbi*(-1)), data=filter(df2, is.rain=="雨天"), 
@@ -288,7 +288,7 @@ ggplot(df2, aes(x=hour,y=rate.sbi, fill=is.rain)) +
 ---  .largecontent
 ## Pyramid
   
-```{r weather-barchar-5,fig.width=12,fig.height=6,echo=FALSE}
+```{r weather-barchar-9,fig.width=12,fig.height=6,echo=FALSE}
 ggplot(df2, aes(x=hour,y=rate.sbi, fill=is.rain)) + 
   geom_bar(data=filter(df2, is.rain=="晴天"), stat="identity") + 
   geom_bar(aes(y=rate.sbi*(-1)), data=filter(df2, is.rain=="雨天"), 
@@ -312,9 +312,9 @@ ggplot(df2, aes(x=hour, y=is.rain, fill=rate.sbi)) +
   thm()
 ```
 
----  .largecontent
+--- .largecontent
 ## 熱點圖
-```{r fig.width=12,fig.height=7,echo=FALSE}
+```{r weather-heatmap-2, fig.width=12,fig.height=7,echo=FALSE}
 ggplot(df2, aes(x=hour, y=is.rain, fill=rate.sbi)) + 
   geom_tile() +
   scale_fill_gradient(name="有車率", low="white", high="midnightblue") + 
@@ -337,7 +337,7 @@ ggparcoord(data = iris, columns = 1:4, groupColumn = 5,
 ---  .largecontent
 ## 平行座標圖
 
-```{r echo=FALSE,fig.width=12,fig.height=7}
+```{r weather-parallelcoordinate-2, echo=FALSE,fig.width=12,fig.height=7}
 df2 <- mutate(df2, rain=as.numeric(is.rain)-1)
 ggparcoord(data = iris, columns = 1:4, groupColumn = 5,
            title = "Parallel Coordinate Plot for the Iris Data") + thm()
@@ -367,7 +367,7 @@ df5 <- tmp %>% select(sno, sna, sarea, lat, lng) %>%
 
 ---  .largecontent
 ## 與鄰近場站的關係
-```{r results='asis',echo=FALSE}
+```{r neighborhood-3, results='asis',echo=FALSE}
 kable(df5, format="html", digits=3, align="c")
 ```
 
@@ -389,7 +389,7 @@ ggmap(map) + thm() +
 ---  .largecontent
 ## 地圖應用範例
 
-```{r results='asis',echo=FALSE,fig.width=12,fig.height=8}
+```{r map-2, results='asis',echo=FALSE,fig.width=12,fig.height=8}
 df5$is.cityhall <- factor(c(1, rep(0, 9)), levels=1:0)
 map <- get_map(location=c(lon=df5$lng[1], lat=df5$lat[1]) , zoom = 15)
 ggmap(map) + thm() +
@@ -401,7 +401,7 @@ ggmap(map) + thm() +
 
 ---  .largecontent
 ## 熱點圖進階應用
-```{r echo=FALSE,fig.width=12}
+```{r cluster-heatmap-0, echo=FALSE,fig.width=12}
 tmp1 <- filter(ubike, sno%in%df5$sno) %>%
   mutate(is.rain=rainfall>1) %>%
   mutate(is.rain=factor(is.rain, levels=c(FALSE, TRUE), 
@@ -457,7 +457,7 @@ df6 <- tmp1 %>%
 
 ---
 ## 熱點圖進階應用
-```{r eval=FALSE}
+```{r cluster-heatmap-2, eval=FALSE}
 ggplot(df6, aes(x=hour, y=sna, fill=rate.sbi)) + geom_tile() + thm() + 
   theme(legend.position="bottom") + 
   scale_fill_gradient(name="有車率", low="white", high="lawngreen") + 
@@ -468,7 +468,7 @@ ggplot(df6, aes(x=hour, y=sna, fill=rate.sbi)) + geom_tile() + thm() +
 --- 
 ## 熱點圖進階應用
 
-```{r echo=FALSE,fig.width=12}
+```{r cluster-heatmap-3, echo=FALSE,fig.width=12}
 tmp1 <- filter(ubike, sno%in%df5$sno) %>%
   mutate(is.rain=rainfall>1) %>%
   mutate(is.rain=factor(is.rain, levels=c(FALSE, TRUE), 
@@ -495,7 +495,7 @@ ggplot(df6, aes(x=hour, y=sna, fill=rate.sbi)) + geom_tile() + thm() +
 
 --- 
 ## 熱點圖進階應用
-```{r eval=FALSE}
+```{r cluster-heatmap-4, eval=FALSE}
 ggplot(df6, aes(x=hour, y=sna, fill=rate.used)) + geom_tile() + thm() + 
   theme(legend.position="bottom") + 
   scale_fill_gradient(name="使用率", low="white", high="Navy") + 
@@ -505,7 +505,7 @@ ggplot(df6, aes(x=hour, y=sna, fill=rate.used)) + geom_tile() + thm() +
 
 --- 
 ## 熱點圖進階應用
-```{r echo=FALSE,fig.width=12}
+```{r cluster-heatmap-5, echo=FALSE,fig.width=12}
 ggplot(df6, aes(x=hour, y=sna, fill=rate.used)) + geom_tile() + thm() + 
   theme(legend.position="bottom") + 
   scale_fill_gradient(name="使用率", low="white", high="Navy") + 
@@ -526,7 +526,7 @@ ggplot(df6, aes(x=hour, y=sna, fill=rate.used)) + geom_tile() + thm() +
 ---
 ## heatmap 排序
 Hint: `library(reshape2)`, `library(ggdendro)` 
-```{r cluster-heatmap-2}
+```{r cluster-heatmap-6}
 dat <- dcast(df6, sna~hour, value.var="rate.sbi")
 rownames(dat) <- dat[,1]
 dat <- dat[,-1]
@@ -534,20 +534,20 @@ dat <- dat[,-1]
 
 ---
 ## heatmap 排序
-```{r echo=FALSE,results='asis'}
+```{r cluster-heatmap-7, echo=FALSE,results='asis'}
 kable(dat[,8:13], format = "html", digits = 3, row.names = TRUE)
 ```
 
 ---
 ## heatmap 排序
-```{r fig.width=12,fig.height=6}
+```{r cluster-heatmap-8, fig.width=12,fig.height=6}
 hc.sna <- hclust(dist(dat))
 ggdendrogram(hc.sna, rotate = TRUE) + thm() + labs(x="", y="")
 ```
 
 ---
 ## heatmap 排序
-```{r results='asis'}
+```{r cluster-heatmap-9, results='asis'}
 # hc.sna$order
 sna.order <- data.frame(order=1:10, sna=hc.sna$labels[hc.sna$order])
 kable(sna.order, format = "html")
@@ -555,7 +555,7 @@ kable(sna.order, format = "html")
 
 ---  .largecontent
 ## heatmap 排序
-```{r eval=FALSE}
+```{r cluster-heatmap-10, eval=FALSE}
 df7 <- df6
 df7$sna <- factor(df7$sna, levels=(sna.order[,2]))
 ggplot(df7, aes(x=hour, y=sna, fill=rate.sbi)) + geom_tile() + thm() + 
@@ -567,7 +567,7 @@ ggplot(df7, aes(x=hour, y=sna, fill=rate.sbi)) + geom_tile() + thm() +
 
 ---  .largecontent
 ## heatmap 排序
-```{r echo=FALSE,fig.width=12}
+```{r cluster-heatmap-11, echo=FALSE,fig.width=12}
 df7 <- df6
 df7$sna <- factor(df7$sna, levels=(sna.order[,2]))
 ggplot(df7, aes(x=hour, y=sna, fill=rate.sbi)) + geom_tile() + thm() + 
@@ -580,14 +580,14 @@ ggplot(df7, aes(x=hour, y=sna, fill=rate.sbi)) + geom_tile() + thm() +
 
 ---  .largecontent
 ## 對時間做排序
-```{r cluster-heatmap-3,fig.width=12,fig.height=6}
+```{r cluster-heatmap-12,fig.width=12,fig.height=6}
 hc.hour <- hclust(dist(t(dat)))
 ggdendrogram(hc.hour) + thm() + labs(x="", y="")
 ```
 
 ---  .largecontent
 ## 對時間做排序
-```{r eval=FALSE}
+```{r cluster-heatmap-13, eval=FALSE}
 hour.order <- data.frame(order=1:24, sna=hc.hour$labels[hc.hour$order])
 df7$hour <- factor(df7$hour, levels=(hour.order[,2]))
 ggplot(df7, aes(x=hour, y=sna, fill=rate.sbi)) + geom_tile() + thm()+ 
@@ -599,7 +599,7 @@ ggplot(df7, aes(x=hour, y=sna, fill=rate.sbi)) + geom_tile() + thm()+
 
 ---  .largecontent
 ## 對時間做排序
-```{r fig.width=12,fig.height=7,echo=FALSE}
+```{r cluster-heatmap-14, fig.width=12,fig.height=7,echo=FALSE}
 hour.order <- data.frame(order=1:24, sna=hc.hour$labels[hc.hour$order])
 df7$hour <- factor(df7$hour, levels=(hour.order[,2]))
 ggplot(df7, aes(x=hour, y=sna, fill=rate.sbi)) + geom_tile() + thm()+ 
@@ -611,7 +611,7 @@ ggplot(df7, aes(x=hour, y=sna, fill=rate.sbi)) + geom_tile() + thm()+
 
 ---  .largecontent
 ## 試著對 使用率 進行排序
-```{r cluster-heatmap-4,eval=FALSE}
+```{r cluster-heatmap-15,eval=FALSE}
 dat <- dcast(df6, sna~hour, value.var="rate.used")
 rownames(dat) <- dat[,1]
 dat <- dat[,-1]
@@ -630,7 +630,7 @@ ggplot(df8, aes(x=hour, y=sna, fill=rate.used)) + geom_tile() + thm()+
 
 ---  .largecontent
 ## 試著對 使用率 進行排序
-```{r echo=FALSE,fig.width=12}
+```{r cluster-heatmap-16, echo=FALSE,fig.width=12}
 dat <- dcast(df6, sna~hour, value.var="rate.used")
 rownames(dat) <- dat[,1]
 dat <- dat[,-1]
@@ -667,7 +667,7 @@ km
 
 ---  .largecontent
 ## 平行座標圖進階應用
-```{r eval=FALSE}
+```{r clustering-1, eval=FALSE}
 df9 <- group_by(tmp2) %>% 
   transmute(sna, tot, rate.sbi, rate.used,
             group=factor(km$cluster))  %>% 
@@ -682,7 +682,7 @@ ggparcoord(as.data.frame(df9), columns = c(1,2,3,4), groupColumn = 5,
 
 ---  .largecontent
 ## 平行座標圖進階應用
-```{r echo=FALSE,fig.width=12}
+```{r clustering-2, echo=FALSE,fig.width=12}
 df9 <- group_by(tmp2) %>% 
   transmute(sna, tot, rate.sbi, rate.used,
             group=factor(km$cluster))  %>% 
@@ -697,7 +697,7 @@ ggparcoord(as.data.frame(df9), columns = c(1,2,3,4), groupColumn = 5,
 
 ---  .largecontent
 ## 平行座標圖進階應用
-```{r echo=FALSE}
+```{r clustering-3, echo=FALSE}
 kable(df9, format="html", digits=3, align="c")
 ```
 
@@ -709,7 +709,7 @@ kable(df9, format="html", digits=3, align="c")
 ### 小明喜歡玩遙控飛機，想利用週末玩，在中和希望找一個風比較小的地點，請幫他在地圖上圈出每個腳踏車站的位置，並且以圓圈大小表示下午3點的風速，透明度表示濕度，顏色表示腳踏車平均車數。
 
 ---  .largecontent
-```{r echo=FALSE,message=FALSE,fig.width=12,fig.height=8}
+```{r ggmap-1, echo=FALSE,message=FALSE,fig.width=12,fig.height=8}
 ubike3<- filter(ubike,sarea=='中和區', hour==15) %>%
   mutate(weekday=weekdays(as.Date(date))) %>%
   filter(weekday=="周六"|weekday=="周日") %>%
@@ -727,7 +727,7 @@ ggmap(m)+
 ```
 
 ---  .largecontent
-```{r eval=TRUE}
+```{r ggmap-2, eval=TRUE}
 ubike3<- filter(ubike,sarea=='中和區', hour==15) %>%
   mutate(weekday=weekdays(as.Date(date))) %>%
   filter(weekday=="周六"|weekday=="周日") %>%
@@ -737,7 +737,7 @@ ubike3<- filter(ubike,sarea=='中和區', hour==15) %>%
 ```
 
 ---  .largecontent
-```{r eval=FALSE}
+```{r ggmap-3, eval=FALSE}
 # 讀取中和區的地圖，以中和區的第一筆資料的經緯度為中心
 m <- get_map(location=c(lon=ubike3$lng[1], lat=ubike3$lat[1]),
            maptype = "roadmap", zoom = 14)
@@ -781,7 +781,7 @@ ggmap(m)+
 
 ---  .largecontent
 ## 可能會用到的小撇步
-```{r,message=FALSE,fig.height=5}
+```{r ggmap-4,message=FALSE,fig.height=5}
 nankang <- geocode('南港軟體園區', source = "google")
 # nankang <- geocode(URLencode('南港軟體園區'), source = "google")
 nan_map <- get_map(location=c(lon=nankang$lon,lat=nankang$lat), 

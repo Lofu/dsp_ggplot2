@@ -112,7 +112,7 @@ ggplot(df1, aes(x=hour, y=rate.sbi)) +
 
 *** =left
 
-![plot of chunk unnamed-chunk-4](assets/fig/unnamed-chunk-4-1.png) 
+![plot of chunk adv8](assets/fig/adv8-1.png) 
 
 *** =right
 右圖為捷運市府站每天有車率的變化，大約晚間十點至隔天凌晨兩點間有車率 (當時段平均車輛數 / 總車輛數) 最低，係因此時YouBike公司將車輛回收，於清晨三點左右陸續將車輛補回。由圖可知三點與四點時有車率大幅增加兩次，推測是市府站規模較大需要兩次小貨車補給 (每次約補給30輛車)。在上午七點左右，有車率開始明顯下降，直至上午十點到達低點，即**29%**。之後有車率略微增加，直至下午一點達到當日次高峰。可以發現，下午三點之後有車率再度明顯下降，直至晚間九點。<br><p>
@@ -203,7 +203,7 @@ ggplot(df2, aes(x=hour, y=rate.sbi, fill=is.rain)) +
 
 ---  .largecontent
 ## Dodge Plot
-![plot of chunk unnamed-chunk-6](assets/fig/unnamed-chunk-6-1.png) 
+![plot of chunk weather-barchar-3](assets/fig/weather-barchar-3-1.png) 
 
 ---  .largecontent
 ## Facet panels
@@ -220,7 +220,7 @@ ggplot(df2, aes(x=hour, y=rate.sbi, fill=is.rain)) +
 
 ---  .largecontent
 ## Facet panels
-![plot of chunk unnamed-chunk-7](assets/fig/unnamed-chunk-7-1.png) 
+![plot of chunk weather-barchar-5](assets/fig/weather-barchar-5-1.png) 
 
 ---  .largecontent
 ## Facet panels
@@ -238,7 +238,7 @@ ggplot(df2, aes(x=hour, y=rate.sbi, fill=is.rain)) +
 
 ---  .largecontent
 ## Facet panels
-![plot of chunk unnamed-chunk-9](assets/fig/unnamed-chunk-9-1.png) 
+![plot of chunk weather-barchar-7](assets/fig/weather-barchar-7-1.png) 
 
 ---  .largecontent
 ## Pyramid
@@ -259,7 +259,7 @@ ggplot(df2, aes(x=hour,y=rate.sbi, fill=is.rain)) +
 ---  .largecontent
 ## Pyramid
   
-![plot of chunk weather-barchar-5](assets/fig/weather-barchar-5-1.png) 
+![plot of chunk weather-barchar-9](assets/fig/weather-barchar-9-1.png) 
 
 ---  .largecontent
 ## 熱點圖
@@ -274,9 +274,9 @@ ggplot(df2, aes(x=hour, y=is.rain, fill=rate.sbi)) +
   thm()
 ```
 
----  .largecontent
+--- .largecontent
 ## 熱點圖
-![plot of chunk unnamed-chunk-11](assets/fig/unnamed-chunk-11-1.png) 
+![plot of chunk weather-heatmap-2](assets/fig/weather-heatmap-2-1.png) 
 
 
 ---  .largecontent
@@ -294,7 +294,7 @@ ggparcoord(data = iris, columns = 1:4, groupColumn = 5,
 ---  .largecontent
 ## 平行座標圖
 
-![plot of chunk unnamed-chunk-12](assets/fig/unnamed-chunk-12-1.png) 
+![plot of chunk weather-parallelcoordinate-2](assets/fig/weather-parallelcoordinate-2-1.png) 
 
 ---  .largecontent
 ## 與鄰近場站的關係
@@ -429,11 +429,11 @@ ggmap(map) + thm() +
 ---  .largecontent
 ## 地圖應用範例
 
-![plot of chunk unnamed-chunk-14](assets/fig/unnamed-chunk-14-1.png) 
+![plot of chunk map-2](assets/fig/map-2-1.png) 
 
 ---  .largecontent
 ## 熱點圖進階應用
-![plot of chunk unnamed-chunk-15](assets/fig/unnamed-chunk-15-1.png) 
+![plot of chunk cluster-heatmap-0](assets/fig/cluster-heatmap-0-1.png) 
 - 有車率與使用率的熱點圖可以看到什麼趨勢？
 - 有沒有自動排序的統計方法？
 
@@ -480,7 +480,7 @@ ggplot(df6, aes(x=hour, y=sna, fill=rate.sbi)) + geom_tile() + thm() +
 --- 
 ## 熱點圖進階應用
 
-![plot of chunk unnamed-chunk-17](assets/fig/unnamed-chunk-17-1.png) 
+![plot of chunk cluster-heatmap-3](assets/fig/cluster-heatmap-3-1.png) 
 
 
 --- 
@@ -496,7 +496,7 @@ ggplot(df6, aes(x=hour, y=sna, fill=rate.used)) + geom_tile() + thm() +
 
 --- 
 ## 熱點圖進階應用
-![plot of chunk unnamed-chunk-19](assets/fig/unnamed-chunk-19-1.png) 
+![plot of chunk cluster-heatmap-5](assets/fig/cluster-heatmap-5-1.png) 
 
 ---  .largecontent
 
@@ -634,7 +634,7 @@ hc.sna <- hclust(dist(dat))
 ggdendrogram(hc.sna, rotate = TRUE) + thm() + labs(x="", y="")
 ```
 
-![plot of chunk unnamed-chunk-21](assets/fig/unnamed-chunk-21-1.png) 
+![plot of chunk cluster-heatmap-8](assets/fig/cluster-heatmap-8-1.png) 
 
 ---
 ## heatmap 排序
@@ -711,7 +711,7 @@ ggplot(df7, aes(x=hour, y=sna, fill=rate.sbi)) + geom_tile() + thm() +
 
 ---  .largecontent
 ## heatmap 排序
-![plot of chunk unnamed-chunk-24](assets/fig/unnamed-chunk-24-1.png) 
+![plot of chunk cluster-heatmap-11](assets/fig/cluster-heatmap-11-1.png) 
 
 
 ---  .largecontent
@@ -722,7 +722,7 @@ hc.hour <- hclust(dist(t(dat)))
 ggdendrogram(hc.hour) + thm() + labs(x="", y="")
 ```
 
-![plot of chunk cluster-heatmap-3](assets/fig/cluster-heatmap-3-1.png) 
+![plot of chunk cluster-heatmap-12](assets/fig/cluster-heatmap-12-1.png) 
 
 ---  .largecontent
 ## 對時間做排序
@@ -739,7 +739,7 @@ ggplot(df7, aes(x=hour, y=sna, fill=rate.sbi)) + geom_tile() + thm()+
 
 ---  .largecontent
 ## 對時間做排序
-![plot of chunk unnamed-chunk-26](assets/fig/unnamed-chunk-26-1.png) 
+![plot of chunk cluster-heatmap-14](assets/fig/cluster-heatmap-14-1.png) 
 
 ---  .largecontent
 ## 試著對 使用率 進行排序
@@ -763,7 +763,7 @@ ggplot(df8, aes(x=hour, y=sna, fill=rate.used)) + geom_tile() + thm()+
 
 ---  .largecontent
 ## 試著對 使用率 進行排序
-![plot of chunk unnamed-chunk-27](assets/fig/unnamed-chunk-27-1.png) 
+![plot of chunk cluster-heatmap-16](assets/fig/cluster-heatmap-16-1.png) 
 
 --- .largecontent
 ## 平行座標圖進階應用
@@ -826,7 +826,7 @@ ggparcoord(as.data.frame(df9), columns = c(1,2,3,4), groupColumn = 5,
 
 ---  .largecontent
 ## 平行座標圖進階應用
-![plot of chunk unnamed-chunk-29](assets/fig/unnamed-chunk-29-1.png) 
+![plot of chunk clustering-2](assets/fig/clustering-2-1.png) 
 
 ---  .largecontent
 ## 平行座標圖進階應用
@@ -922,7 +922,7 @@ ggparcoord(as.data.frame(df9), columns = c(1,2,3,4), groupColumn = 5,
 ### 小明喜歡玩遙控飛機，想利用週末玩，在中和希望找一個風比較小的地點，請幫他在地圖上圈出每個腳踏車站的位置，並且以圓圈大小表示下午3點的風速，透明度表示濕度，顏色表示腳踏車平均車數。
 
 ---  .largecontent
-![plot of chunk unnamed-chunk-31](assets/fig/unnamed-chunk-31-1.png) 
+![plot of chunk ggmap-1](assets/fig/ggmap-1-1.png) 
 
 ---  .largecontent
 
@@ -990,7 +990,7 @@ nan_map <- get_map(location=c(lon=nankang$lon,lat=nankang$lat),
 ggmap(nan_map)
 ```
 
-![plot of chunk unnamed-chunk-34](assets/fig/unnamed-chunk-34-1.png) 
+![plot of chunk ggmap-4](assets/fig/ggmap-4-1.png) 
 
 --- .dark .segue
 ## Team Project

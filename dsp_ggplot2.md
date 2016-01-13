@@ -406,7 +406,7 @@ ggplot(WP.df, aes(x=year, y=Asia)) +
 
 ### Wide format
 <!-- html table generated in R 3.2.2 by xtable 1.8-0 package -->
-<!-- Thu Jan 14 02:29:25 2016 -->
+<!-- Thu Jan 14 02:48:11 2016 -->
 <table border=1>
 <tr> <th>  </th> <th> N.Amer </th> <th> Europe </th> <th> Asia </th> <th> S.Amer </th> <th> Oceania </th> <th> Africa </th> <th> Mid.Amer </th> <th> year </th>  </tr>
   <tr> <td align="right"> 1951 </td> <td align="right"> 45939.00 </td> <td align="right"> 21574.00 </td> <td align="right"> 2876.00 </td> <td align="right"> 1815.00 </td> <td align="right"> 1646.00 </td> <td align="right"> 89.00 </td> <td align="right"> 555.00 </td> <td align="right"> 1951.00 </td> </tr>
@@ -429,7 +429,7 @@ WP.long <- melt(WP.df, id='year') #id是將保留的欄位名稱
 colnames(WP.long) <- c('year','area','number')
 ```
 <!-- html table generated in R 3.2.2 by xtable 1.8-0 package -->
-<!-- Thu Jan 14 02:29:25 2016 -->
+<!-- Thu Jan 14 02:48:11 2016 -->
 <table border=1>
 <tr> <th>  </th> <th> year </th> <th> area </th> <th> number </th>  </tr>
   <tr> <td align="right"> 1 </td> <td align="right"> 1951.00 </td> <td> N.Amer </td> <td align="right"> 45939.00 </td> </tr>
